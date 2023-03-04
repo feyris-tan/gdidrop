@@ -128,7 +128,7 @@ namespace gdidrop
                 else
                 {
                     int gapOffset = CountIndexFrames(currentTrack.Indices[1]);
-                    sectorAmount = CopyFileWithGapOffset(inputTrackFilePath, outputTrackFilePath, gapOffset);
+                    sectorAmount = CopyFileWithGapOffset(inputTrackFilePath, outputTrackFilePath, gapOffset, currentTrack.TrackNumber, cueSheet);
                     currentSector += gapOffset;
                 }
 
@@ -162,7 +162,7 @@ namespace gdidrop
             return result;
         }
 
-        private int CopyFileWithGapOffset(string inputFile, string outputFile, int frames)
+        private int CopyFileWithGapOffset(string inputFile, string outputFile, int frames, int trackNum, CueSheet cue)
         {
             Stream infile = File.OpenRead(inputFile);
             Stream outfile = File.OpenWrite(outputFile);
@@ -174,6 +174,27 @@ namespace gdidrop
             {
                 blockSize = infile.Read(buffer, 0, blockSize);
                 outfile.Write(buffer, 0, blockSize);
+            }
+            if(frames%2 == 0 && trackNum != 2 && trackNum + 1 != cue.Tracks.Length)
+            {
+                Array.Clear(buffer, 0, buffer.Length);
+                blockSize = 2352;
+                while(frames > 0)
+                {
+                    outfile.Write(buffer, 0, blockSize);
+                    frames--;
+                }
+            }
+            if (trackNum + 1 == cue.Tracks.Length)
+            {
+                frames = 75;
+                Array.Clear(buffer, 0, buffer.Length);
+                blockSize = 2352;
+                while (frames > 0)
+                {
+                    outfile.Write(buffer, 0, blockSize);
+                    frames--;
+                }
             }
             outfile.Flush();
             outfile.Close();
