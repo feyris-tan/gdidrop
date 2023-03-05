@@ -118,7 +118,11 @@ namespace gdidrop
                     "track{0}.{1}",
                     currentTrack.TrackNumber,
                     currentTrack.TrackDataType == DataType.AUDIO ? "raw" : "bin");
-                string outputTrackFilePath = Path.Combine(workingDirectory.FullName, outputTrackFileName);
+                string outputTrackFilePath = Path.Combine(workingDirectory.FullName+"\\output", outputTrackFileName);
+                if (!Directory.Exists(outputTrackFilePath))
+                {
+                    Directory.CreateDirectory(workingDirectory+"\\output");
+                }
                 int sectorAmount;
                 if (canPerformFullCopy)
                 {
@@ -149,7 +153,7 @@ namespace gdidrop
                         currentSector = 45000;
             }
             
-            string gdiOutputPath = Path.Combine(workingDirectory.FullName, "disc.gdi");
+            string gdiOutputPath = Path.Combine(workingDirectory.FullName+"\\output", "disc.gdi");
             File.WriteAllText(gdiOutputPath, gdiOutput.ToString());
             inProgress = false;
         }
